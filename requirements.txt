@@ -3,5 +3,6 @@ pandas
 streamlit
 requests
 datetime
+json
 streamlit_g2
 streamlit_l7

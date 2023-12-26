@@ -4,7 +4,6 @@ import requests
 import json
 from datetime import datetime, time
 from streamlit_g2 import g2
-from streamlit_echarts import st_echarts
 
 ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca']
 
