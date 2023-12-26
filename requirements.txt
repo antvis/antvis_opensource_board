@@ -1,3 +1,7 @@
 altair
 pandas
 streamlit
+requests
+datetime
+streamlit_g2
+streamlit_l7

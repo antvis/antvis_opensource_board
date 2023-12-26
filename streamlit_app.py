@@ -1,40 +1,144 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import requests
+import json
+from datetime import datetime, time
+from streamlit_g2 import g2
+from streamlit_echarts import st_echarts
 
-"""
-# Welcome to Streamlit!
+ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca']
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+def get_prs_since(owner, repo, since_date, state='all', token=None):
+    # 如果使用了私有仓库，请提供 GitHub Personal Access Token
+    headers = {}
+    if token:
+        headers['Authorization'] = f"Bearer {token}"
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+    # GitHub API URL
+    url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+    # 存储 PR 的列表
+    prs_since = []
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+    # 初始化页码
+    page = 1
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+    while True:
+        # 发送 GET 请求，使用分页参数和起始日期
+        response = requests.get(url,  headers=headers, params={'page': page, 'state':state, 'per_page': 100, 'since': since_date})
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+        # 检查响应状态码
+        if response.status_code == 200:
+            # 解析 JSON 响应
+            prs = response.json()
+
+            # 将当前页的 PR 添加到列表
+            for pr in prs:
+                    created_at_str = pr['created_at']
+                    created_at = datetime.strptime(created_at_str, '%Y-%m-%dT%H:%M:%SZ')
+
+                    if created_at >= since_date:
+                        prs_since.append(pr)
+                    else:
+                        # 如果创建时间早于指定时间，停止查询
+                        return prs_since
+
+            # 如果当前页 PR 数量小于分页数量，说明没有更多的 PR 了
+            if len(prs) < 100:
+                break
+
+            # 增加页码，准备获取下一页
+            page += 1
+        else:
+            print(f"Error: {response.status_code}")
+            return None
+
+    return prs_since
+
+# 创建两列
+col1, col2 = st.columns(2)
+
+# 替换为你的 GitHub 仓库信息
+owner = "antvis"
+
+# 在第一列中创建一个下拉框
+selected_repo = col1.selectbox("选择仓库", ["G2", "G6", "L7","S2","X6"])
+
+# 在第二列中创建一个时间选择器
+selected_date2 = col2.date_input("选择开始时间",  datetime.combine(datetime(2023, 7, 1).date(), time()))
+
+selected_date  = datetime(selected_date2.year, selected_date2.month, selected_date2.day)
+
+# api_token = st.secrets["GIT_HUB"]
+
+
+# 获取自指定日期以来的所有 PR
+prs_since = get_prs_since(owner, selected_repo,  selected_date, token=st.secrets["GIT_HUB"])
+
+data = []
+if prs_since:
+    for pr in prs_since:
+        pr_id = pr['number']
+        title = pr['title']
+        creator = pr['user']['login']
+        created_at = pr['created_at']
+        creator_type = 'in'  if creator in ownerList else 'out'
+        # changed_files = pr['changed_files']
+
+        data.append([pr_id, title, creator, created_at,creator_type])
+
+
+# 创建 DataFrame 存储 PR 数据
+df = pd.DataFrame(data, columns=['pr_id', 'title', 'creator','created_at','creator_type'])
+
+# 将 created_at 列的字符串表示转换为 datetime 对象
+df['created_at'] = pd.to_datetime(df['created_at'])
+
+# 添加一个新列表示年月日
+df['date'] = df['created_at'].dt.strftime('%Y-%m-%d')
+
+# 添加一个新列表示年月
+df['year_month'] = df['created_at'].dt.strftime('%Y-%m')
+
+
+# 按月份聚合 PR 数据
+aggregated_data = df.groupby('year_month').size().reset_index(name='count')
+
+
+st.markdown('### 月度 PR 数')
+
+options = {
+    "autoFit": True,
+    "type": "interval",
+    "data": json.loads(aggregated_data.to_json(orient='records')),
+    "encode": {
+        "x": "year_month",
+        "y": "count",
+    }
+}
+g2(options=options)
+
+
+
+# 按照年月和创建者聚合 PR 数据
+aggregated_creator = df.groupby(['year_month', 'creator_type']).size().reset_index(name='count')
+
+options2 = {
+    "autoFit": True,
+    "type": "interval",
+    "data": json.loads(aggregated_creator.to_json(orient='records')),
+    "encode": {
+        "x": "year_month",
+        "y": "count",
+        "color": "creator_type"
+    },
+    "transform": [{ "type": "stackY" }],
+    "scale": {
+        "x": { "padding": 0.3 }
+    },
+    "interaction": { "elementHighlight": { "background": True } },
+}
+st.markdown('### 内外PR数占比')
+
+g2(options=options2,key='2')
