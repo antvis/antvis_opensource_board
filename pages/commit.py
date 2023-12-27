@@ -90,7 +90,6 @@ df['year_month'] =pd.to_datetime(df['date']).dt.strftime('%Y-%m')
 
 # 按月份聚合 PR 数据
 aggregated_data = df.groupby(['year_month', 'author_type']).size().reset_index(name='count')
-st.table(aggregated_data)
 st.markdown('### 月度 Commit 数')
 
 options = {
