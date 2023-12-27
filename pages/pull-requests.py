@@ -144,7 +144,7 @@ options2 = {
     },
     "axis":{
         "x":{
-            title: '时间'
+            "title": '时间'
         }
         
     },
