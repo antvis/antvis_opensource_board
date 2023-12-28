@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import requests
-import math
 import json
 from datetime import datetime, time
 from streamlit_g2 import g2

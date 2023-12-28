@@ -1,15 +1,16 @@
+
 import requests
+import os
+import sys
+project_root = os.path.abspath('../utils/common')
+sys.path.append(project_root)
 import streamlit as st
 import pandas as pd
 import json
 from datetime import datetime, time
 from streamlit_g2 import g2
-ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo']
-def getUserType(name:str):
-    if name in ownerList:
-        return 'in'
-    else:
-        return 'out'
+from utils import getUserType,getGitHubToken
+
 st.set_page_config(page_title="pull-requests", page_icon="🐠", layout="wide")
 
 def get_commits_since(owner, repo, since,token =None):
@@ -82,7 +83,7 @@ repo = selected_repo
 since = selected_date  # 如果要按日期范围获取，请提供起始日期
 
 # 获取提交信息
-data = get_commits_since(owner, repo,  since, token=st.secrets["GIT_HUB"])
+data = get_commits_since(owner, repo,  since, token=getGitHubToken())
 df = pd.DataFrame(data, columns=['name', 'date','author_type'])
 
 df['year_month'] =pd.to_datetime(df['date']).dt.strftime('%Y-%m')
