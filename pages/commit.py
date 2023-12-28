@@ -4,12 +4,13 @@ import os
 import sys
 project_root = os.path.abspath('../utils/common')
 sys.path.append(project_root)
+from utils import getUserType,getGitHubToken
 import streamlit as st
 import pandas as pd
 import json
 from datetime import datetime, time
 from streamlit_g2 import g2
-from utils import getUserType,getGitHubToken
+
 
 st.set_page_config(page_title="pull-requests", page_icon="🐠", layout="wide")
 

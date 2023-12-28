@@ -1,9 +1,15 @@
+import os
+import sys
+project_root = os.path.abspath('../utils/common')
+sys.path.append(project_root)
+from utils import getUserType,getGitHubToken
 import streamlit as st
 import pandas as pd
 import requests
 import json
 from datetime import datetime, time
 from streamlit_g2 import g2
+
 st.set_page_config(page_title="pull-requests", page_icon="⭐", layout="wide")
 def get_star_history(owner, repo,since_date, access_token):
     star_history = []
@@ -55,7 +61,7 @@ repo = selected_repo
 
 # since = selected_date  # 如果要按日期范围获取，请提供起始日期
 
-access_token = st.secrets['GIT_HUB']
+access_token =getGitHubToken()
 
 star_history = get_star_history(owner, repo, selected_date, access_token)
 

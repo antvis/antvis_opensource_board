@@ -1,5 +1,5 @@
 import random
-from streamlit import st
+import streamlit as st
 
 ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo']
 def getUserType(name:str):

@@ -1,3 +1,8 @@
+import os
+import sys
+project_root = os.path.abspath('../utils/common')
+sys.path.append(project_root)
+from utils import getUserType,getGitHubToken
 import streamlit as st
 import pandas as pd
 import requests
@@ -73,7 +78,7 @@ selected_date  = datetime(selected_date2.year, selected_date2.month, selected_da
 
 
 # 获取自指定日期以来的所有 PR
-prs_since = get_prs_since(owner, selected_repo,  selected_date, token=st.secrets["GIT_HUB"])
+prs_since = get_prs_since(owner, selected_repo,  selected_date, token=getGitHubToken())
 
 data = []
 if prs_since:
@@ -82,7 +87,7 @@ if prs_since:
         title = pr['title']
         creator = pr['user']['login']
         created_at = pr['created_at']
-        creator_type = 'in'  if creator in ownerList else 'out'
+        creator_type = 'in'  if getUserType() else 'out'
         # changed_files = pr['changed_files']
 
         data.append([pr_id, title, creator, created_at,creator_type])
