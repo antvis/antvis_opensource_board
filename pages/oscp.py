@@ -9,7 +9,7 @@ import json
 from datetime import datetime, time
 from streamlit_g2 import g2
 
-st.set_page_config(page_title="pull-requests", page_icon="📈")
+st.set_page_config(page_title="oscp", page_icon="📈", layout="wide")
 st.markdown('### AntV  OSCP 社区github活跃度报告')
 # 创建两列
 col1, col2 = st.columns(2)
@@ -53,7 +53,7 @@ pr_summary_df = aggregated_data.groupby('creator_type')['count'].sum().reset_ind
 cm_summary_df = cm_data.groupby('creator_type')['count'].sum().reset_index()
 
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 with col1:
     col1.markdown('### 贡献者人数内外占比')

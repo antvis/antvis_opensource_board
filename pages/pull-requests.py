@@ -10,7 +10,7 @@ import json
 from datetime import datetime, time
 from streamlit_g2 import g2
 
-ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo','lvisei','heiyexing']
+ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan-Wang','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo','lvisei','heiyexing']
 
 def get_prs_since(owner, repo, since_date, state='all', token=None):
     # 如果使用了私有仓库，请提供 GitHub Personal Access Token

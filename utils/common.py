@@ -6,7 +6,7 @@ import requests
 import json
 from datetime import datetime, time
 
-ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo','lvisei','heiyexing']
+ownerList = ['hustcc','xiaoiver','pearmini','lzxue','Yanyan-Wang','Aarebecca','bubkoo','NewByVector','lijinke666','wjgogogo','lvisei','heiyexing']
 def getUserType(name:str):
     if name in ownerList:
         return 'in'
