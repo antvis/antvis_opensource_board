@@ -32,9 +32,11 @@ commitDf = get_commits_since(owner, selected_repo, selected_date)
 
 
 # # 按月份聚合 PR 数据
-aggregated_data = df.groupby(['creator','year_month','creator_type']).size().reset_index(name='count').sort_values(by='count',ascending=False)
-cm_data = commitDf.groupby(['creator','year_month','creator_type']).size().reset_index(name='count').sort_values(by='count',ascending=False)
+aggregated_data = df.groupby(['creator','creator_type']).size().reset_index(name='count').sort_values(by='count',ascending=False)
+cm_data = commitDf.groupby(['creator','creator_type']).size().reset_index(name='count').sort_values(by='count',ascending=False)
 aggregated_data['type']='pull_request'
+
+
 cm_data['type']='commit'
 cocat_data = pd.concat([aggregated_data,cm_data])
 # 过滤 creator_type 为 in 的数据
@@ -53,108 +55,18 @@ pr_summary_df = aggregated_data.groupby('creator_type')['count'].sum().reset_ind
 cm_summary_df = cm_data.groupby('creator_type')['count'].sum().reset_index()
 
 
-col1, col2 = st.columns(2)
+# col1, col2 = st.columns(2)
 
-with col1:
-    col1.markdown('### 贡献者人数内外占比')
+# with col1:
+#     col1.markdown('### 贡献者人数内外占比')
 
-    options = {
-        "type": "interval",
-        "coordinate": {
-            "type": "theta"
-        },
-        "data": json.loads(creator_type_counts.to_json(orient='records')),
-         "encode": {
-            "y": "count",
-            "color": "creator_type"
-        },
-        "transform": [
-            { "type": "stackY" }
-        ],
-        "scale":{
-            "color": {
-            "type": 'ordinal',
-            "domain": ['in', 'out'],
-            "range": ['#fc8d59','#91bfdb'],
-         },
-        },
-        "style": {
-            "radius": 4,
-            "stroke": "#fff",
-            "lineWidth": 1
-        },
-        "labels": [
-            {
-            "text": "count",
-            "radius": 0.9
-            }
-        ],
-        "animate": {
-            "enter": {
-            "type": "waveIn"
-            }
-        },
-        "label":{
-            "position": 'outside',
-        },
-        "axis": False,
-        "legend": True,
-    }
-
-    g2(options=options,style={'height': '300px'},key=0)
-    
-with col2:
-    col2.markdown('### 贡献者PR数内外占比')
-    options = {
-        "type": "interval",
-        "coordinate": {
-            "type": "theta"
-        },
-        "data": json.loads(pr_summary_df.to_json(orient='records')),
-        "encode": {
-            "y": "count",
-            "color": "creator_type"
-        },
-        "transform": [
-            { "type": "stackY" }
-        ],
-        "style": {
-            "radius": 4,
-            "stroke": "#fff",
-            "lineWidth": 1
-        },
-        "labels": [
-            {
-            "text": "count",
-            "radius": 0.9
-            }
-        ],
-        "animate": {
-            "enter": {
-            "type": "waveIn"
-            }
-        },
-        "scale":{
-            'color': {
-            "type": 'ordinal',
-            "domain": ['in', 'out'],
-            "range": ['#fc8d59','#91bfdb'],
-        },
-        },
-        "axis": False,
-        "legend": True,
-    }
-
-    g2(options=options, style={'height': '300px'},key=1)
-# with col3:
-#     col3.markdown('#### 贡献者 Commit 数内外占比')
 #     options = {
 #         "type": "interval",
 #         "coordinate": {
 #             "type": "theta"
 #         },
-#         "data": json.loads(cm_summary_df.to_json(orient='records')),
-#         "encode": {
+#         "data": json.loads(creator_type_counts.to_json(orient='records')),
+#          "encode": {
 #             "y": "count",
 #             "color": "creator_type"
 #         },
@@ -162,11 +74,11 @@ with col2:
 #             { "type": "stackY" }
 #         ],
 #         "scale":{
-#             'color': {
+#             "color": {
 #             "type": 'ordinal',
 #             "domain": ['in', 'out'],
 #             "range": ['#fc8d59','#91bfdb'],
-#         },
+#          },
 #         },
 #         "style": {
 #             "radius": 4,
@@ -184,13 +96,103 @@ with col2:
 #             "type": "waveIn"
 #             }
 #         },
+#         "label":{
+#             "position": 'outside',
+#         },
 #         "axis": False,
 #         "legend": True,
 #     }
 
-#     g2(options=options, style={'height': '300'},key=3)
+#     g2(options=options,style={'height': '300px'},key=0)
+    
+# with col2:
+#     col2.markdown('### 贡献者PR数内外占比')
+#     options = {
+#         "type": "interval",
+#         "coordinate": {
+#             "type": "theta"
+#         },
+#         "data": json.loads(pr_summary_df.to_json(orient='records')),
+#         "encode": {
+#             "y": "count",
+#             "color": "creator_type"
+#         },
+#         "transform": [
+#             { "type": "stackY" }
+#         ],
+#         "style": {
+#             "radius": 4,
+#             "stroke": "#fff",
+#             "lineWidth": 1
+#         },
+#         "labels": [
+#             {
+#             "text": "count",
+#             "radius": 0.9
+#             }
+#         ],
+#         "animate": {
+#             "enter": {
+#             "type": "waveIn"
+#             }
+#         },
+#         "scale":{
+#             'color': {
+#             "type": 'ordinal',
+#             "domain": ['in', 'out'],
+#             "range": ['#fc8d59','#91bfdb'],
+#         },
+#         },
+#         "axis": False,
+#         "legend": True,
+#     }
 
-st.markdown('#### 月度 PR 数')
+#     g2(options=options, style={'height': '300px'},key=1)
+# # with col3:
+# #     col3.markdown('#### 贡献者 Commit 数内外占比')
+# #     options = {
+# #         "type": "interval",
+# #         "coordinate": {
+# #             "type": "theta"
+# #         },
+# #         "data": json.loads(cm_summary_df.to_json(orient='records')),
+# #         "encode": {
+# #             "y": "count",
+# #             "color": "creator_type"
+# #         },
+# #         "transform": [
+# #             { "type": "stackY" }
+# #         ],
+# #         "scale":{
+# #             'color': {
+# #             "type": 'ordinal',
+# #             "domain": ['in', 'out'],
+# #             "range": ['#fc8d59','#91bfdb'],
+# #         },
+# #         },
+# #         "style": {
+# #             "radius": 4,
+# #             "stroke": "#fff",
+# #             "lineWidth": 1
+# #         },
+# #         "labels": [
+# #             {
+# #             "text": "count",
+# #             "radius": 0.9
+# #             }
+# #         ],
+# #         "animate": {
+# #             "enter": {
+# #             "type": "waveIn"
+# #             }
+# #         },
+# #         "axis": False,
+# #         "legend": True,
+# #     }
+
+# #     g2(options=options, style={'height': '300'},key=3)
+
+st.markdown('#### OSCP PR 数')
 
 options = {
     "autoFit": True,
@@ -203,39 +205,41 @@ options = {
     },
 
     "data": json.loads(aggregated_data.to_json(orient='records')),
+    "labels":[{
+       "text": "count",
+    }],
     "encode": {
         "x": "creator",
         "y": "count",
         "color": "creator_type",
     }
+    
 }
 g2(options=options,style={'height': '600px'})
 
 
+# st.markdown('#### 社区活跃度报告')
 
-
-st.markdown('#### 社区活跃度报告')
-
-options = {
-    "autoFit": True,
-    "type": "interval",
-    "coordinate": {
-        "transform": [
+# options = {
+#     "autoFit": True,
+#     "type": "interval",
+#     "coordinate": {
+#         "transform": [
         
-            { "type": "transpose" }
+#             { "type": "transpose" }
             
-        ]
-    },
-    # "transform": [{ "type": "stackY" }],
-    "transform": [{ "type": "dodgeX" }],
-    "data": json.loads(cocat_data.to_json(orient='records')),
-    "encode": {
-        "x": "creator",
-        "y": "count",
-        "color": "type",
-    }
-}
-g2(options=options,style={'height': '800px'})
+#         ]
+#     },
+#     # "transform": [{ "type": "stackY" }],
+#     "transform": [{ "type": "dodgeX" }],
+#     "data": json.loads(cocat_data.to_json(orient='records')),
+#     "encode": {
+#         "x": "creator",
+#         "y": "count",
+#         "color": "type",
+#     }
+# }
+# g2(options=options,style={'height': '800px'})
 
-
-    
+st.markdown('#### OSCP PR 数明细')
+st.table(aggregated_data[['creator','count']])
